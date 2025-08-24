@@ -11,7 +11,7 @@ export default function ElectionCard({ title }: { title: string }) {
   return (
     <Card className="my-3 cursor-pointer rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:shadow-pink-500/30 transition">
       <CardHeader className={`text-center ${myFont.className}`}>
-        <CardTitle className="text-3xl font-bold text-transparent bg-clip-text bg-black drop-shadow-md">
+        <CardTitle className="text-4xl font-extraboldtext-transparent bg-clip-text bg-black drop-shadow-md">
           {title}
         </CardTitle>
       </CardHeader>

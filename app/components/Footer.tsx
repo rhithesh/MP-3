@@ -5,7 +5,7 @@ import Image from "next/image";
 
 
 
-const myFont = localFont({
+const FFont = localFont({
   src: "../../fonts/CryptonInk.ttf",
   variable: "--font-crypto",
   display: "swap",
@@ -32,7 +32,7 @@ export default function Footer() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-8">
           
           {/* Big Heading */}
-          <h2 className={`text-5xl ${myFont.className} font-extrabold text-transparent bg-clip-text 
+          <h2 className={`text-5xl ${FFont.className} font-extrabold text-transparent bg-clip-text 
                          bg-gradient-to-r from-pink-500 via-violet-500 to-cyan-500 
                          drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]`}>
             Contact Us
