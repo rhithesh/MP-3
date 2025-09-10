@@ -52,3 +52,17 @@ export async function getUserById(userId: string) {
     },
   };
 }
+
+
+
+export async function updateUserCounter(userId: string, newCounter: number) {
+  // Update the counter field for the Passkey associated with the userId
+  const updatedPasskey = await prisma.passkey.updateMany({
+    where: { userId },
+    data: {
+      counter: newCounter,
+    },
+  });
+
+  return updatedPasskey;
+}
