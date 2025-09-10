@@ -29,3 +29,26 @@ export async function getUserbyEmail(email:string) {
 
   
 }
+
+
+export async function getUserById(userId: string) {
+  // Assuming one Passkey per userId
+  const passkey = await prisma.passkey.findFirst({
+    where: { id: userId }, // Look up by userId (foreign key)
+  });
+
+  if (!passkey) {
+    return null;
+  }
+
+  return {
+    id: userId,
+    passKey: {
+      id: passkey.id,
+      credentialId: passkey.credentialId,
+      publicKey: passkey.publicKey,
+      counter: passkey.counter,
+      transports: passkey.transports,
+    },
+  };
+}

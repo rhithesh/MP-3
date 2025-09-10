@@ -25,10 +25,10 @@ export async function GET(req: Request) {
   const options = await generateAuthenticationOptions({
     rpID: RP_ID,
     allowCredentials: [
-      {
-        id: base64url(user.credentialId),
-        transports: ['internal'] as unknown as AuthenticatorTransportFuture[] ,
-      },
+      // {
+      //   id: base64url(user.credentialId),
+      //   transports: ['hybrid','internal'] as unknown as AuthenticatorTransportFuture[] ,
+      // },
     ],
   })
 
