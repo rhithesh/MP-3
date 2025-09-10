@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import { motion } from "framer-motion";
 import TeamSection from "./Team";
 
-const myFont = localFont({
+const HFont = localFont({
   src: "../../fonts/CryptonInk.ttf",
   variable: "--font-crypto",
   display: "swap",
@@ -30,7 +30,7 @@ export default function Hero() {
         <ParallaxLayer offset={0} speed={0.6}>
           <div className="flex items-center justify-center h-screen">
             <h1
-              className={`text-5xl ${myFont.className} font-bold text-white drop-shadow-lg`}
+              className={`text-5xl ${HFont.className} font-bold text-white drop-shadow-lg`}
             >
               Welcome to <br />
               the Story <br />
@@ -63,7 +63,7 @@ export default function Hero() {
               {[
                 {
                   title: "Adventure",
-                  desc: "Explore breathtaking places with parallax storytelling.",
+                  desc: "With the help of our teacher S.",
                 },
                 {
                   title: "Memories",

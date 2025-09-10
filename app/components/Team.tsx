@@ -11,7 +11,7 @@ export default function TeamSection() {
   ];
 
   return (
-<section className="relative z-10 py-20 border-4 border-red-500">
+<section className="relative z-10 py-20 ">
       <h2
         className="text-center text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text 
                    bg-gradient-to-r from-pink-500 via-violet-500 to-cyan-500 

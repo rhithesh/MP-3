@@ -33,9 +33,16 @@ export default function VotingPage() {
 
   return (
     <div className="min-h-screen bg-[url('/3.jpg')] bg-cover bg-center  px-6 py-16">
-      <h1 className="text-4xl !text-left mt-6 ml-6 md:text-6xl font-extrabold text-white drop-shadow-lg mb-12">
-        Cast Your Vote
-      </h1>
+   <div className="flex justify-between items-center mt-6 mb-12 px-6">
+  <h1 className="text-4xl md:text-6xl font-extrabold text-white drop-shadow-lg">
+    Cast Your Vote
+  </h1>
+
+  <button className="text-3xl cursor-pointer font-bold px-4 py-2 bg-blue-500 text-white rounded-lg">
+    +
+  </button>
+</div>
+
 
       <div className="mx-3 my-3">
              {elections.map((title, idx) => (
