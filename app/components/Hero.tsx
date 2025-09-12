@@ -62,16 +62,16 @@ export default function Hero() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
               {[
                 {
-                  title: "Adventure",
-                  desc: "With the help of our teacher S.",
+                  title: "Voting made faster and secure",
+                  desc: "Tradi.",
                 },
                 {
-                  title: "Memories",
+                  title: "We store no details",
                   desc: "Relive the moments through immersive visuals.",
                 },
                 {
-                  title: "Journey",
-                  desc: "A path that unfolds as you scroll down the story.",
+                  title: "Quick and simple",
+                  desc: "This is as simple as it gets.",
                 },
               ].map((card, idx) => (
                 <motion.div

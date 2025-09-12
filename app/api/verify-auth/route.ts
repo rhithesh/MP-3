@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   if (verification.verified) {
     await updateUserCounter(user.id, verification.authenticationInfo.newCounter);
     cookieStore.delete('authInfo');
-    return Response.json({ verified: true });
+    return Response.json({ verified: true ,user:user});
   }
 
   return new Response(JSON.stringify({ verified: false, error: 'Verification failed' }), { status: 400 });
