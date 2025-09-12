@@ -79,19 +79,19 @@ export default function RegisterPage() {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg bg-white/20 placeholder-white text-white mb-4 focus:outline-none"
+          className="w-full font-serif px-4 py-3 rounded-lg bg-white/20 placeholder-white text-white mb-4 focus:outline-none"
         />
 
         <button
           onClick={handleRegister}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg mb-3 transition"
+          className="w-full font-serif bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg mb-3 transition"
         >
           Register
         </button>
 
         <button
           onClick={handleLogin}
-          className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg transition"
+          className="w-full bg-green-500 font-serif hover:bg-green-600 text-white py-2 rounded-lg transition"
         >
           Login
         </button>
