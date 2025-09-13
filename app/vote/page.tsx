@@ -28,6 +28,10 @@ export default function VotingPage() {
   const [userId] = useState("user-abc123");
   const [verified] = useState(true);
 
+
+  const credentialId = JSON.stringify(localStorage.getItem("CryptoElectAuth")).user.credentialId;
+
+
   useEffect(() => {
     async function fetchElections() {
       try {
@@ -39,6 +43,33 @@ export default function VotingPage() {
       } finally {
         setLoading(false);
       }
+    }
+
+    async function verifyUser(){
+     try{
+
+        const profileRes = await fetch("/api/buissnes/profileCheck", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ credentialId: credentialId}),
+        });
+        const profileData = await profileRes.json();
+
+        if  (profileData.exists){
+          console.log("User verified!!")
+        }
+        else{
+          console.error("User Failed")
+
+
+        }
+
+
+     }
+     catch(e){
+      console.error(e)
+     }
+
     }
 
     fetchElections();
