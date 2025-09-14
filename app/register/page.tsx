@@ -33,7 +33,7 @@ export default function RegisterPage() {
     const verification = await verificationRes.json()
 
     if (verification.verified) {
-      localStorage.setItem("CryptoElectAuth",verification)
+localStorage.setItem("CryptoElectAuth", JSON.stringify(verification));
       setStatus('Login successful!')
     } else {
       setStatus('Login failed.')

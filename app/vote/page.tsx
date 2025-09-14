@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent ,CardTitle} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import ElectionCard from "../components/ElectionCard";
 
 const parties = [
   { id: 1, name: "Crypto Elect", desc: "A futuristic decentralized vision.", logo: "/party1.png" },
@@ -18,6 +19,7 @@ export default function VotingPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [elections, setElections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [credentialId, setCredentialId] = useState<string | null>(null);
 
   // For creating new election
   const [newElectionTitle, setNewElectionTitle] = useState("");
@@ -28,16 +30,50 @@ export default function VotingPage() {
   const [userId] = useState("user-abc123");
   const [verified] = useState(true);
 
-
-  const credentialId = JSON.stringify(localStorage.getItem("CryptoElectAuth")).user.credentialId;
-
-
   useEffect(() => {
-    async function fetchElections() {
+    async function initialize() {
+      const userJson = localStorage.getItem("CryptoElectAuth");
+
+      let extractedCredentialId = null;
+
       try {
-        const res = await fetch("/api/buissnes/getelections");
-        const data = await res.json();
-        setElections(data.elections);
+        if (userJson) {
+          const userObj = JSON.parse(userJson);
+          console.log(userObj)
+          extractedCredentialId = userObj?.credentialId || userObj?.user?.passKey?.credentialId;
+          console.log("Extracted credentialId:", extractedCredentialId);
+          setCredentialId(extractedCredentialId);
+        } else {
+          console.error("No CryptoElectAuth found in localStorage");
+        }
+      } catch (error) {
+        console.error("Error parsing stored user object:", error);
+      }
+
+      if (extractedCredentialId) {
+        try {
+          const profileRes = await fetch("/api/buissnes/profileCheck", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ credentialId: extractedCredentialId }),
+          });
+
+          const profileData = await profileRes.json();
+          if (profileData.exists) {
+            console.log("User verified!!", profileData.user);
+          } else {
+            console.error("User verification failed");
+          }
+        } catch (e) {
+          console.error("Profile check error:", e);
+        }
+      }
+
+      try {
+        const electionsRes = await fetch("/api/buissnes/getelections");
+        const electionsData = await electionsRes.json();
+        console.log(electionsData.elections)
+        setElections(electionsData.elections);
       } catch (err) {
         console.error("Error fetching elections:", err);
       } finally {
@@ -45,44 +81,16 @@ export default function VotingPage() {
       }
     }
 
-    async function verifyUser(){
-     try{
-
-        const profileRes = await fetch("/api/buissnes/profileCheck", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ credentialId: credentialId}),
-        });
-        const profileData = await profileRes.json();
-
-        if  (profileData.exists){
-          console.log("User verified!!")
-        }
-        else{
-          console.error("User Failed")
-
-
-        }
-
-
-     }
-     catch(e){
-      console.error(e)
-     }
-
-    }
-
-    fetchElections();
+    initialize();
   }, []);
 
-  // Voting
   const handleVoteClick = (party: any) => {
     setSelectedParty(party);
     setVoteDialogOpen(true);
   };
 
   const handleVoteConfirm = async (electionId: string) => {
-    if (!selectedParty) return;
+    if (!selectedParty || !credentialId) return;
 
     try {
       const res = await fetch("/api/buissnes/votetoelection", {
@@ -101,7 +109,9 @@ export default function VotingPage() {
         alert(`Vote cast successfully for ${selectedParty.name}!`);
         setVoteDialogOpen(false);
         setSelectedParty(null);
-        const updatedElections = await fetch("/api/buissnes/getelections").then(res => res.json());
+
+        // Refresh elections to show updated results
+        const updatedElections = await fetch("/api/buissnes/getelections").then((res) => res.json());
         setElections(updatedElections.elections);
       } else {
         alert(data.error || "Failed to vote");
@@ -112,13 +122,12 @@ export default function VotingPage() {
     }
   };
 
-  // Creating election
   const handleCreateElection = async () => {
     if (!newElectionTitle || !newElectionDesc || newElectionCandidates.length === 0)
       return alert("Please fill all fields and add at least one candidate");
 
     try {
-      const res = await fetch("/api/buissnes/createelection", {
+      const res = await fetch("/api/buissnes/createElection", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -137,7 +146,7 @@ export default function VotingPage() {
         setNewElectionTitle("");
         setNewElectionDesc("");
         setNewElectionCandidates([]);
-        setElections(prev => [...prev, data.election]);
+        setElections((prev) => [...prev, data.election]);
       } else {
         alert(data.error || "Failed to create election");
       }
@@ -165,24 +174,10 @@ export default function VotingPage() {
 
       <div className="mx-3 my-3">
         {elections.map((election) => (
-          <Card key={election.id} className="mb-4 bg-white/80">
-            <CardHeader>
-              <h2 className="text-xl font-bold">{election.title}</h2>
-            </CardHeader>
-            <CardContent>
-              <p>{election.description}</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                {parties.map((party) => (
-                  <Card key={party.id} className="p-2 cursor-pointer" onClick={() => handleVoteClick(party)}>
-                    <img src={party.logo} alt={party.name} className="w-full h-24 object-contain mb-2" />
-                    <h3 className="font-bold text-center">{party.name}</h3>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+          <>
+              <ElectionCard title={election.title} description={election.description}  result={election.results}  handleVoteClick={handleVoteClick}/>
+              </>))
+    }
 
       {/* Vote Confirmation Dialog */}
       <Dialog open={voteDialogOpen} onOpenChange={setVoteDialogOpen}>
@@ -192,9 +187,21 @@ export default function VotingPage() {
           </DialogHeader>
           {selectedParty && (
             <div className="text-center">
-              <p className="mb-4">Are you sure you want to vote for {selectedParty.name}?</p>
-              <Button className="mr-2" onClick={() => handleVoteConfirm(elections[0]?.id)}>Yes, Vote</Button>
-              <Button variant="secondary" onClick={() => setVoteDialogOpen(false)}>Cancel</Button>
+              <p className="mb-4">
+                Are you sure you want to vote for {selectedParty.name}?
+              </p>
+              <Button
+                className="mr-2"
+                onClick={() => handleVoteConfirm(elections[0]?.id)}
+              >
+                Yes, Vote
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setVoteDialogOpen(false)}
+              >
+                Cancel
+              </Button>
             </div>
           )}
         </DialogContent>
@@ -221,7 +228,6 @@ export default function VotingPage() {
               onChange={(e) => setNewElectionDesc(e.target.value)}
             />
 
-            {/* Candidates Input */}
             <div className="flex flex-col gap-2">
               <label className="font-bold">Candidates:</label>
               <div className="flex gap-2">
@@ -235,7 +241,10 @@ export default function VotingPage() {
                 <Button
                   onClick={() => {
                     if (newCandidateInput.trim()) {
-                      setNewElectionCandidates(prev => [...prev, newCandidateInput.trim()]);
+                      setNewElectionCandidates((prev) => [
+                        ...prev,
+                        newCandidateInput.trim(),
+                      ]);
                       setNewCandidateInput("");
                     }
                   }}
@@ -245,11 +254,20 @@ export default function VotingPage() {
               </div>
               <div className="flex gap-2 flex-wrap">
                 {newElectionCandidates.map((c, idx) => (
-                  <span key={idx} className="bg-blue-200 px-2 py-1 rounded-full flex items-center gap-1">
+                  <span
+                    key={idx}
+                    className="bg-blue-200 px-2 py-1 rounded-full flex items-center gap-1"
+                  >
                     {c}
-                    <button onClick={() =>
-                      setNewElectionCandidates(prev => prev.filter((_, i) => i !== idx))
-                    }>✕</button>
+                    <button
+                      onClick={() =>
+                        setNewElectionCandidates((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        )
+                      }
+                    >
+                      ✕
+                    </button>
                   </span>
                 ))}
               </div>
@@ -257,11 +275,17 @@ export default function VotingPage() {
 
             <div className="flex justify-end gap-2 mt-4">
               <Button onClick={handleCreateElection}>Create</Button>
-              <Button variant="secondary" onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
+              <Button
+                variant="secondary"
+                onClick={() => setCreateDialogOpen(false)}
+              >
+                Cancel
+              </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }
