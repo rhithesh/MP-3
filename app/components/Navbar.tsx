@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,12 +29,10 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* CTA Button (Desktop) */}
-        <Link href="/register">
-          <button className="hidden md:block bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
-            Get Started
-          </button>
-        </Link>
+        {/* Wallet Button (Desktop) */}
+        <div className="hidden md:block">
+          <WalletMultiButton />
+        </div>
 
         {/* Mobile Menu Button */}
         <button
@@ -58,11 +57,11 @@ export default function Navbar() {
               <Link href="/vote">Vote</Link>
             </li>
           </ul>
-          <Link href="/register">
-            <button className="w-full mt-4 bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition">
-              Get Started
-            </button>
-          </Link>
+
+          {/* Wallet Button (Mobile) */}
+          <div className="mt-4">
+            <WalletMultiButton />
+          </div>
         </div>
       )}
     </header>

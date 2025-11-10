@@ -35,4 +35,5 @@ model Election {
   createdAt   DateTime  @default(now())
   voters      String[]  // Array of user IDs who voted
   results     Json
+  transactionSignatures String[]
 }
