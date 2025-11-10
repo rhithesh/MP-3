@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import WalletContextProvider from "./components/WalletContextProvider";
 import "@solana/wallet-adapter-react-ui/styles.css"; // <-- Add this
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,8 @@ export default function RootLayout({
         <WalletContextProvider>
           <Navbar />
           {children}
+          <Toaster richColors position="top-center" />
+
           <Footer />
         </WalletContextProvider>
       </body>

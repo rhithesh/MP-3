@@ -16,9 +16,11 @@ const parties = [
 export default function VotingPage() {
   const [selectedParty, setSelectedParty] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [currentElectionId, setCurrentElectionId] = useState<string | null>(null);
 
   const handleVoteClick = (party: any) => {
     setSelectedParty(party);
+    setCurrentElectionId(electionId); // ✅ store election ID
     setOpen(true);
   };
 

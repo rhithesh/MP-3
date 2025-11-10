@@ -29,11 +29,11 @@ model Passkey {
 
 
 model Election {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  createdAt   DateTime  @default(now())
-  voters      String[]  // Array of user IDs who voted
-  results     Json
-  transactionSignatures String[]
+  id                     String   @id @default(cuid())
+  title                  String
+  description            String?
+  createdAt              DateTime @default(now())
+  voters                 String[] @default([])              // ✅ FIX
+  results                Json
+  transactionSignatures  String[] @default([])              // ✅ FIX
 }

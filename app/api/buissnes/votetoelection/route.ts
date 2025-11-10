@@ -51,8 +51,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Election not found" }, { status: 404 });
 
     // ✅ Prevent double-voting
-    if (election.voters.includes(userId))
+    if ((election.voters ?? []).includes(userId))
       return NextResponse.json({ error: "Already voted" }, { status: 400 });
+    
 
     if (election.transactionSignatures.includes(signature))
       return NextResponse.json({ error: "Duplicate signature" }, { status: 400 });
