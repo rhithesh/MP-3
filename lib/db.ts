@@ -3,7 +3,7 @@ import { PrismaClient } from './generated/prisma';
 
 const prisma = new PrismaClient();
 
-export async function savePasskey(newPasskey) {
+export async function savePasskey(newPasskey, secretKey?: string) {
   await prisma.passkey.create({
     data: {
       userId: newPasskey.user.userid,
@@ -15,6 +15,7 @@ export async function savePasskey(newPasskey) {
       transports: newPasskey.transports?.join(','), // Store as CSV string
       deviceType: newPasskey.deviceType,
       backedUp: newPasskey.backedUp,
+      secretKey: secretKey,
     },
   });
 }

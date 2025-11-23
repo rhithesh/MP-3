@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { CredentialDeviceType } from '@simplewebauthn/browser'
 import { AuthenticatorTransportFuture } from '@simplewebauthn/server'
 import { savePasskey } from '@/lib/db'
+import { randomBytes } from 'crypto'
 
 const RP_ID="localhost"
 const CLIENT_URL="http://localhost:3000"
@@ -47,6 +48,10 @@ if (registrationInfo) {
   const { credential, credentialDeviceType, credentialBackedUp } = registrationInfo;
   // Now you can use credential, credentialDeviceType, credentialBackedUp safely here
 
+  // Generate a secret key (32 bytes = 256 bits, base64 encoded for easy display)
+  const secretKeyBytes = randomBytes(32)
+  const secretKey = secretKeyBytes.toString('base64')
+
 const newPasskey: NewPasskey = {
   user: {
     userid: regInfo.userId,
@@ -61,11 +66,11 @@ const newPasskey: NewPasskey = {
   backedUp: credentialBackedUp,
 };
 console.log(newPasskey)
-const ans=await savePasskey(newPasskey)
+const ans=await savePasskey(newPasskey, secretKey)
 
 
 console.log(ans)
-    return Response.json({ verified: true })
+    return Response.json({ verified: true, secretKey })
 
 }
 

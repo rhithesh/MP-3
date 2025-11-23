@@ -16,6 +16,7 @@ import {
   SystemProgram,
   Transaction,
   PublicKey,
+  TransactionInstruction,
 } from "@solana/web3.js";
 import { toast } from "sonner";
 
@@ -74,12 +75,37 @@ export default function VotingPage() {
     try {
       const receiver = new PublicKey("6GkgfKeGCixwH4dCnYJgP18o4LX9fRagJugZjLVgSA4X");
 
+      // Create vote data JSON to store on-chain
+      const voteData = {
+        electionId: currentElectionId,
+        userId: userId,
+        candidate: selectedParty.name,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Create memo instruction manually
+      const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+      const memoData = JSON.stringify(voteData);
+      
+      // Convert string to bytes - use TextEncoder for browser compatibility
+      const encoder = new TextEncoder();
+      const memoBytes = encoder.encode(memoData);
+      
+      // TransactionInstruction accepts Uint8Array at runtime, even though types say Buffer
+      const memoInstruction = new TransactionInstruction({
+        keys: [{ pubkey: publicKey, isSigner: true, isWritable: false }],
+        programId: MEMO_PROGRAM_ID,
+        data: memoBytes as Buffer, // Type assertion - Uint8Array works at runtime
+      });
+
       const tx = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: receiver,
           lamports: 0.2 * LAMPORTS_PER_SOL,
-        })
+        }),
+        // Add memo instruction with vote data
+        memoInstruction
       );
 
       const signature = await sendTransaction(tx, connection);
@@ -100,17 +126,37 @@ export default function VotingPage() {
       if (!res.ok) return alert(data.error);
 
       toast.success(
-        <>
-          ✅ Vote Recorded! <br />
-          <a
-            href={`https://solscan.io/tx/${signature}?cluster=devnet`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-blue-300 font-semibold"
-          >
-            View on Solscan
-          </a>
-        </>
+        <div className="space-y-2">
+          <div>✅ Vote Recorded on Solana!</div>
+          <div className="flex flex-col gap-2 text-sm">
+            <a
+              href={`https://solscan.io/tx/${signature}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-blue-300 font-semibold hover:text-blue-200"
+            >
+              🔍 View on Solscan (Devnet)
+            </a>
+            <a
+              href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-purple-300 font-semibold hover:text-purple-200"
+            >
+              🔗 View on Solana Explorer (Devnet)
+            </a>
+            {publicKey && (
+              <a
+                href={`https://solscan.io/account/${publicKey.toBase58()}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-green-300 font-semibold hover:text-green-200"
+              >
+                💼 View Your Wallet (Devnet)
+              </a>
+            )}
+          </div>
+        </div>
       );
       
 
@@ -164,6 +210,26 @@ export default function VotingPage() {
       <div className="flex justify-between items-center mb-12">
         <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">Cast Your Vote</h1>
         <div className="flex items-center gap-4">
+          {publicKey && (
+            <div className="flex flex-col items-end gap-1">
+              <a
+                href={`https://solscan.io/account/${publicKey.toBase58()}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/80 hover:text-white underline"
+              >
+                View Wallet on Solscan
+              </a>
+              <a
+                href={`https://explorer.solana.com/address/${publicKey.toBase58()}?cluster=devnet`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/80 hover:text-white underline"
+              >
+                View on Explorer
+              </a>
+            </div>
+          )}
           <WalletMultiButton />
           <button
             className="text-3xl font-bold px-4 py-2 bg-blue-500 text-white rounded-lg"
@@ -182,6 +248,7 @@ export default function VotingPage() {
           title={election.title}
           description={election.description}
           result={election.results}
+          transactionSignatures={election.transactionSignatures || []}
           handleVoteClick={handleVoteClick}
         />
       ))}
